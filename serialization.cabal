@@ -24,7 +24,7 @@ library
                  persist,
                  binary,
                  flat,
-                 packman,
+                --  packman,
                  store
 
 test-suite docs
@@ -57,7 +57,7 @@ benchmark all
                 persist,
                 binary,
                 flat,
-                packman,
+                -- packman,
                 store,
                 datasets
   hs-source-dirs:      src

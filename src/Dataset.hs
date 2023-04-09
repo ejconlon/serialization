@@ -6,7 +6,7 @@ module Dataset(carsData,irisData) where
 import           Control.DeepSeq
 import qualified Data.Binary                as B
 import Codec.Serialise as CBOR
-import qualified Data.Flat                  as F
+import qualified Flat                  as F
 import qualified Data.Serialize             as C
 import qualified Data.Persist                as R
 import qualified Data.Store                 as S

@@ -18,7 +18,7 @@ import           Criterion.Types
 import qualified Data.Binary          as B
 import qualified Data.ByteString      as BS
 import qualified Data.ByteString.Lazy as LBS
-import qualified Data.Flat            as F
+import qualified Flat            as F
 import           Data.List
 import qualified Data.Persist         as R
 import qualified Data.Serialize       as C
@@ -28,7 +28,7 @@ import qualified Data.Text.Encoding   as T
 import           Data.Typeable
 import           Dataset
 import           GHC.Generics
-import qualified GHC.Packing          as P
+-- import qualified GHC.Packing          as P
 import           Report
 import           System.Mem           (performMajorGC)
 
@@ -160,8 +160,8 @@ data PkgPersist =
 data PkgCereal =
   PkgCereal
 
-data PkgPackman =
-  PkgPackman
+-- data PkgPackman =
+--   PkgPackman
 
 data PkgCBOR =
   PkgCBOR
@@ -197,13 +197,13 @@ instance (C.Serialize a, NFData a) => Serialize PkgCereal a where
   {-# NOINLINE deserialize #-}
   deserialize _ = either error (return . force) . C.decode
 
-instance (NFData a, Typeable a) => Serialize PkgPackman a where
-  {-# NOINLINE serialize #-}
-  serialize _ =
-    fmap (force . LBS.toStrict . B.encode) .
-    flip P.trySerializeWith (1000 * 2 ^ (20 :: Int))
-  {-# NOINLINE deserialize #-}
-  deserialize _ = fmap force . P.deserialize . B.decode . LBS.fromStrict
+-- instance (NFData a, Typeable a) => Serialize PkgPackman a where
+--   {-# NOINLINE serialize #-}
+--   serialize _ =
+--     fmap (force . LBS.toStrict . B.encode) .
+--     flip P.trySerializeWith (1000 * 2 ^ (20 :: Int))
+--   {-# NOINLINE deserialize #-}
+--   deserialize _ = fmap force . P.deserialize . B.decode . LBS.fromStrict
 
 instance (CBOR.Serialise a, NFData a) => Serialize PkgCBOR a where
   {-# NOINLINE serialize #-}
@@ -247,13 +247,13 @@ pkgs ::
 --      , ("store-ser", serialize PkgStore, deserialize PkgStore)]
 --   ]
 pkgs =
-  [ ("flat", serialize PkgFlat, deserialize PkgFlat)
-  , ("store", serialize PkgStore, deserialize PkgStore)
+  -- [ ("flat", serialize PkgFlat, deserialize PkgFlat)
+  [ ("store", serialize PkgStore, deserialize PkgStore)
   , ("binary", serialize PkgBinary, deserialize PkgBinary)
   , ("cereal", serialize PkgCereal, deserialize PkgCereal)
-  , ("persist", serialize PkgPersist, deserialize PkgPersist)
-  , ("packman", serialize PkgPackman, deserialize PkgPackman)
-  , ("serialise", serialize PkgCBOR, deserialize PkgCBOR)
+  -- , ("persist", serialize PkgPersist, deserialize PkgPersist)
+  -- , ("packman", serialize PkgPackman, deserialize PkgPackman)
+  -- , ("serialise", serialize PkgCBOR, deserialize PkgCBOR)
   -- , ("show", serialize PkgShow, deserialize PkgShow)
   ]
 
