@@ -18,15 +18,15 @@ packages:
     git: git@github.com:DataHaskell/dh-core.git
     subdir: datasets
 - completed:
-    commit: 9c40aea27c4a1ab5b81dd6cd461ad86d531e55f3
+    commit: f517f40fddcd02bec7f1306eb33bfcb66bfc3f1e
     git: git@github.com:ejconlon/dahdit.git
     name: dahdit
     pantry-tree:
-      sha256: 356a39f3b2cd391afc244f9c4a5433a35484609e4cb5c8e13700b7fd2abe8f3c
-      size: 1739
+      sha256: 9160add1a239563dce9ae8aa426be7676a1ceda34dc5a33f0b9a741e5d837267
+      size: 1749
     version: 0.2.0
   original:
-    commit: 9c40aea27c4a1ab5b81dd6cd461ad86d531e55f3
+    commit: f517f40fddcd02bec7f1306eb33bfcb66bfc3f1e
     git: git@github.com:ejconlon/dahdit.git
 - completed:
     hackage: data-sword-0.2.0.3@sha256:953cca4b4533a388df0ef17e06ac5530652d1d73decfe8b656242ccdf4b40999,1568

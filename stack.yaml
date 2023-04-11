@@ -12,7 +12,7 @@ extra-deps:
   commit: 02af0b351e0ee12b35df32741ad2363c863a652a
   subdir: datasets
 - git: git@github.com:ejconlon/dahdit.git
-  commit: 9c40aea27c4a1ab5b81dd6cd461ad86d531e55f3
+  commit: f517f40fddcd02bec7f1306eb33bfcb66bfc3f1e
 - data-sword-0.2.0.3
 - flat-0.6
 # - packman-0.5.0

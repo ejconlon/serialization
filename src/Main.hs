@@ -9,12 +9,15 @@
 {-# LANGUAGE NoMonomorphismRestriction #-}
 {-# LANGUAGE ScopedTypeVariables       #-}
 {-# LANGUAGE TupleSections             #-}
+{-# LANGUAGE DerivingVia               #-}
+{-# LANGUAGE StandaloneDeriving        #-}
 
 module Main where
 
 import           Codec.Serialise      as CBOR
 import           Control.DeepSeq
 import           Criterion.Types
+import qualified Dahdit as D
 import qualified Data.Binary          as B
 import qualified Data.ByteString      as BS
 import qualified Data.ByteString.Lazy as LBS
@@ -37,6 +40,7 @@ import           Test.QuickCheck
 
 -- Benchmarks
 import           Criterion.Main
+import Data.Word (Word8)
 
 data BinTree a
   = Tree (BinTree a)
@@ -57,6 +61,9 @@ instance {-# OVERLAPPABLE #-} R.Persist a => R.Persist (BinTree a)
 
 instance {-# OVERLAPPABLE #-} CBOR.Serialise a =>
                               CBOR.Serialise (BinTree a)
+
+deriving via (D.ViaGeneric (BinTree a)) instance D.ByteSized a => D.ByteSized (BinTree a)
+deriving via (D.ViaGeneric (BinTree a)) instance D.Binary a => D.Binary (BinTree a)
 
 -- -- Specialised instances, might increase performance
 -- instance {-# OVERLAPPING #-} F.Flat [Direction]
@@ -100,6 +107,8 @@ data Direction
            , Show
            , Typeable
            , Generic
+           , Enum
+           , Bounded
            , NFData
            , B.Binary
            , C.Serialize
@@ -108,6 +117,11 @@ data Direction
            , R.Persist
            , F.Flat
            )
+
+deriving via (D.ViaBoundedEnum Word8 Direction) instance D.BinaryRep Word8 Direction
+deriving via (D.ViaBinaryRep Direction) instance D.ByteSized Direction
+deriving via (D.ViaBinaryRep Direction) instance D.StaticByteSized Direction
+deriving via (D.ViaBinaryRep Direction) instance D.Binary Direction
 
 instance Arbitrary Direction where
   arbitrary = elements [North, South, Center, East, West]
@@ -160,6 +174,9 @@ data PkgPersist =
 data PkgCereal =
   PkgCereal
 
+data PkgDahdit =
+  PkgDahdit
+
 -- data PkgPackman =
 --   PkgPackman
 
@@ -196,6 +213,12 @@ instance (C.Serialize a, NFData a) => Serialize PkgCereal a where
   serialize _ = return . force . C.encode
   {-# NOINLINE deserialize #-}
   deserialize _ = either error (return . force) . C.decode
+
+instance (D.Binary a, D.ByteSized a, NFData a) => Serialize PkgDahdit a where
+  {-# NOINLINE serialize #-}
+  serialize _ = return . force . D.encode
+  {-# NOINLINE deserialize #-}
+  deserialize _ = either (error . D.prettyGetError) (return . force) . fst . D.decode
 
 -- instance (NFData a, Typeable a) => Serialize PkgPackman a where
 --   {-# NOINLINE serialize #-}
@@ -238,6 +261,8 @@ pkgs ::
      , S.Store a
      , F.Flat a
      , B.Binary a
+     , D.ByteSized a
+     , D.Binary a
      , Show a
      , Read a
      )
@@ -251,6 +276,7 @@ pkgs =
   [ ("store", serialize PkgStore, deserialize PkgStore)
   , ("binary", serialize PkgBinary, deserialize PkgBinary)
   , ("cereal", serialize PkgCereal, deserialize PkgCereal)
+  , ("dahdit", serialize PkgDahdit, deserialize PkgDahdit)
   -- , ("persist", serialize PkgPersist, deserialize PkgPersist)
   -- , ("packman", serialize PkgPackman, deserialize PkgPackman)
   -- , ("serialise", serialize PkgCBOR, deserialize PkgCBOR)
@@ -341,6 +367,8 @@ sizes ::
      , Serialise t
      , R.Persist t
      , C.Serialize t
+     , D.ByteSized t
+     , D.Binary t
      , S.Store t,Show t, Read t
      )
   => (String, t)
@@ -362,6 +390,8 @@ benchs ::
      , Serialise a
      , R.Persist a
      , C.Serialize a
+     , D.ByteSized a
+     , D.Binary a
      , S.Store a,Read a,Show a
      )
   => (String, a)
